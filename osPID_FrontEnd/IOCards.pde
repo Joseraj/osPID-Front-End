@@ -83,6 +83,42 @@ void CreateUI(String cardID, String tab, int top)
     InputControls.add(T0Field); 
     InputControls.add(R0Field); 
     InputControls.add(BetaField);
+  } else if (cardID.equals("IID3"))
+  {
+
+    ClearInput();
+    InputCard = cardID;
+    InputControls.clear();
+
+
+    controlP5.addTextlabel("spec0", "Specify which input to use: ", configLeft, top);
+
+    r2 = controlP5.addRadioButton("radioButton2", configLeft, top+22);
+    r2.setColorForeground(color(120));
+    r2.setColorActive(color(255));
+    r2.setColorLabel(color(255));
+    r2.setItemsPerRow(1);
+    r2.setSpacingColumn(75);
+    addToRadioButton(r2, "Thermocouple", 1);
+    addToRadioButton(r2, "PT100", 2);
+    r2.getItem(0).setState(true);
+
+    controlP5.addButton("Send_Input_Config")
+      .setValue(0.0)
+      .setPosition(configLeft, top + 180)
+      .setSize(160, 20)
+      ; 
+    String[] names = {
+      "spec0", "Send_Input_Config"                              };
+    for (int i=0; i<names.length; i++)
+    {
+      controlP5.getController(names[i]).moveTo(tab);
+      InputControls.add(controlP5.getController(names[i]));
+    }
+
+    r2.moveTo(tab); 
+    InputControls.add(r2); 
+    
   } else if (cardID.equals("OID1"))
   {
 
@@ -324,6 +360,12 @@ void PopulateCardFields(String cardName, String[] fields)
     R0Field.setText(fields[2]);    //   the arduino,  take the
     BetaField.setText(fields[3]);    //   current values and put
     T0Field.setText(fields[4]);
+  } else if (cardName.equals("IID3"))
+  {
+    int v = int(fields[1]); 
+    if (v==0) r2.getItem(0).setState(true);
+    else if (v==1) r2.getItem(1).setState(true);
+
   } else if (cardName.equals("IID0"))
   {
     int v1 = int(fields[1]); 
@@ -381,6 +423,13 @@ void Send_Input_Config()
       float(R0Field.getText()), //hidden reference resistance
       }
       ));
+  } else if (InputCard.equals("IID3"))
+  {
+    myPort.write(byte(5));
+    Byte a =0;
+    if (r2.getState(1)==true)a=1;
+    myPort.write(a);
+
   } else if (InputCard.equals("IID0"))
   {
     myPort.write(byte(5));
